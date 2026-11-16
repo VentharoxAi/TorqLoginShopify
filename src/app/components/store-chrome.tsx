@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const storeUrl = "https://torqbearingsstore.myshopify.com";
@@ -6,6 +7,7 @@ export function StoreHeader() {
   return (
     <header className="site-header">
       <Link className="store-brand" href={storeUrl} target="_blank" rel="noopener noreferrer">
+        <Image src="/torq-logo.jpg" width={30} height={30} alt="" unoptimized />
         torqbearingsStore
       </Link>
       <nav className="store-nav" aria-label="Store navigation">
