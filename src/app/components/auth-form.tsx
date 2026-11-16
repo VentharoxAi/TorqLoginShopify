@@ -41,18 +41,18 @@ export function AuthForm({ mode }: Props) {
 
   return (
     <form className="form-stack" onSubmit={submit}>
-      {isSignup && (
-        <div className="field">
-          <label htmlFor="username">Username</label>
-          <input id="username" name="username" autoComplete="username" minLength={3} maxLength={32} required placeholder="Choose a username" />
-          <span className="field-hint">3–32 letters, numbers, dots, underscores or hyphens.</span>
-        </div>
-      )}
       {!isAdmin && (
         <div className="field">
           <label htmlFor="mobileNumber">Mobile Number</label>
           <input id="mobileNumber" name="mobileNumber" type="tel" autoComplete="tel" inputMode="tel" required placeholder="+92 300 1234567" />
           <span className="field-hint">Include your country code, for example +92.</span>
+        </div>
+      )}
+      {isSignup && (
+        <div className="field">
+          <label htmlFor="username">Username</label>
+          <input id="username" name="username" autoComplete="username" minLength={3} maxLength={32} required placeholder="Choose a username" />
+          <span className="field-hint">3–32 letters, numbers, dots, underscores or hyphens.</span>
         </div>
       )}
       {isAdmin && (

@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { AuthForm } from "@/app/components/auth-form";
+import { StoreFooter, StoreHeader } from "@/app/components/store-chrome";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -9,13 +9,7 @@ export default async function AdminLoginPage() {
   if (session?.role === "admin") redirect("/admin");
   return (
     <>
-      <header className="site-header">
-        <Link className="brand" href="/login">
-          <Image src="/torq-logo.jpg" width={52} height={52} alt="TORQ Bearings logo" unoptimized />
-          <span className="brand-name">TORQ BEARINGS<span className="brand-sub">INDUSTRIES</span></span>
-        </Link>
-        <span className="header-note">Administrator access</span>
-      </header>
+      <StoreHeader />
       <main className="auth-shell">
         <section className="auth-card admin-login">
           <div className="auth-main">
@@ -27,6 +21,7 @@ export default async function AdminLoginPage() {
           </div>
         </section>
       </main>
+      <StoreFooter />
     </>
   );
 }
