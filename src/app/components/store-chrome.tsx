@@ -1,35 +1,19 @@
-import Image from "next/image";
 import Link from "next/link";
+import { getCustomerHeaderCustomer } from "@/lib/customer-header";
+import { CustomerHeader } from "@/app/components/customer-header";
+import type { CustomerHeaderCustomer } from "@/lib/customer-header";
 
 const storeUrl = "https://torqbearingsstore.myshopify.com";
 
-export function StoreHeader() {
-  return (
-    <header className="site-header">
-      <Link className="store-brand" href={storeUrl} target="_blank" rel="noopener noreferrer">
-        <Image src="/torq-logo.jpg" width={30} height={30} alt="" unoptimized />
-        torqbearingsStore
-      </Link>
-      <nav className="store-nav" aria-label="Store navigation">
-        <Link href={storeUrl} target="_blank" rel="noopener noreferrer">Home</Link>
-        <Link href={`${storeUrl}/pages/contact`} target="_blank" rel="noopener noreferrer">Contact</Link>
-      </nav>
-      <div className="store-actions">
-        <Link className="store-icon-link" href="/login" aria-label="Customer account">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="8" r="3.25" />
-            <path d="M5.5 20c.6-3.5 2.8-5.3 6.5-5.3s5.9 1.8 6.5 5.3" />
-          </svg>
-        </Link>
-        <Link className="store-icon-link" href={`${storeUrl}/cart`} target="_blank" rel="noopener noreferrer" aria-label="Shopping cart">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5.5 7.5h13l-.8 13h-11z" />
-            <path d="M9 8V6a3 3 0 0 1 6 0v2" />
-          </svg>
-        </Link>
-      </div>
-    </header>
-  );
+export { getCustomerHeaderCustomer } from "@/lib/customer-header";
+
+export async function StoreHeader({
+  customer,
+}: {
+  customer?: CustomerHeaderCustomer;
+} = {}) {
+  const headerCustomer = customer ?? await getCustomerHeaderCustomer();
+  return <CustomerHeader customer={headerCustomer} />;
 }
 
 export function StoreFooter() {
@@ -61,7 +45,7 @@ export function StoreFooter() {
       </div>
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} torqbearingsStore</span>
-        <Link href="/login">Customer account</Link>
+        <Link href="/signup">Customer account</Link>
       </div>
     </footer>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuthBackLink } from "@/app/components/auth-back-link";
 import { AuthForm } from "@/app/components/auth-form";
 import { StoreFooter, StoreHeader } from "@/app/components/store-chrome";
 
@@ -11,20 +12,25 @@ export default async function LoginPage({
   return (
     <>
       <StoreHeader />
-      <main className="auth-shell">
-        <section className="auth-card">
-          <div className="auth-main">
-            <span className="form-eyebrow">Customer account</span>
-            <h1>Welcome back</h1>
-            <p className="auth-intro">Sign in with your registered mobile number.</p>
-            {params.registered === "1" && <div className="message message-success" style={{ marginBottom: 16 }}>Account created. Your account is pending approval.</div>}
+      <main className="signup-page">
+        <div className="auth-card-container">
+          <AuthBackLink />
+          <section className="signup-card">
+            <header className="signup-card-header">
+              <h1>Sign in to TORQ</h1>
+              <p>Use your mobile number to continue.</p>
+            </header>
+            {params.registered === "1" && (
+              <div className="message message-success login-success-message">
+                Account created. Your account is pending approval.
+              </div>
+            )}
             <AuthForm mode="login" />
-            <div className="inline-links">
-              <Link href="/forgot-password">Forgot password?</Link>
-              <span>New here? <Link href="/signup">Create account</Link></span>
-            </div>
-          </div>
-        </section>
+            <p className="signup-login-prompt">
+              New customer? <Link href="/signup">Create account</Link>
+            </p>
+          </section>
+        </div>
       </main>
       <StoreFooter />
     </>

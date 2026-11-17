@@ -26,7 +26,12 @@ export async function POST(request: Request) {
     }
 
     await createSession("customer", customer._id.toString());
-    return NextResponse.json({ message: "Signed in." });
+    const redirectTo = !customer.shop_details?.completedAt
+      ? "/account/details"
+      : customer.shop_details.status === "approved"
+        ? "/store"
+        : "/dashboard";
+    return NextResponse.json({ message: "Signed in.", redirectTo });
   } catch (error) {
     console.error("Customer login failed.", error);
     return NextResponse.json({ error: "Unable to sign in right now. Please try again." }, { status: 500 });

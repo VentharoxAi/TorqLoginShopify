@@ -1,161 +1,136 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
-type Customer = {
+type AccountStatus = "pending" | "approved" | "blocked";
+type CustomerRow = {
   id: string;
-  username: string;
+  shopName: string;
+  contactPersonName: string;
+  city: string;
   mobileNumber: string;
-  status: "pending" | "approved" | "blocked";
-  createdAt: string;
+  status: AccountStatus;
+  submittedAt: string | null;
+};
+type CustomerListResult = {
+  counts: Record<AccountStatus, number>;
+  page: number;
+  totalPages: number;
+  customers: CustomerRow[];
 };
 
-type GeneratedResetLink = {
-  username: string;
-  mobileNumber: string;
-  url: string;
-};
+const statuses: AccountStatus[] = ["pending", "approved", "blocked"];
 
 export function AdminDashboard() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<CustomerRow[]>([]);
+  const [counts, setCounts] = useState<Record<AccountStatus, number>>({
+    pending: 0,
+    approved: 0,
+    blocked: 0,
+  });
+  const [status, setStatus] = useState<AccountStatus>("pending");
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("all");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [busyId, setBusyId] = useState("");
-  const [resetLink, setResetLink] = useState<GeneratedResetLink | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const loadCustomers = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const params = new URLSearchParams({ q: search, status });
-      const response = await fetch(`/api/admin/customers?${params}`, { cache: "no-store" });
-      const result = await response.json();
+      const params = new URLSearchParams({ status, q: search, page: String(page) });
+      const response = await fetch(`/admin/api/customers?${params}`, { cache: "no-store" });
+      const result = await response.json() as CustomerListResult & { error?: string };
       if (!response.ok) throw new Error(result.error ?? "Unable to load customers.");
       setCustomers(result.customers);
+      setCounts(result.counts);
+      setTotalPages(result.totalPages);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Unable to load customers.");
     } finally {
       setLoading(false);
     }
-  }, [search, status]);
+  }, [page, search, status]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => void loadCustomers(), 250);
+    const timer = window.setTimeout(() => void loadCustomers(), 200);
     return () => window.clearTimeout(timer);
   }, [loadCustomers]);
 
-  async function updateStatus(customer: Customer, nextStatus: Customer["status"]) {
-    setBusyId(customer.id);
-    setError("");
-    try {
-      const response = await fetch(`/api/admin/customers/${customer.id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: nextStatus }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? "Unable to update account status.");
-      await loadCustomers();
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unable to update account status.");
-    } finally {
-      setBusyId("");
-    }
+  function chooseStatus(nextStatus: AccountStatus) {
+    setStatus(nextStatus);
+    setPage(1);
   }
-
-  async function sendReset(customer: Customer) {
-    setBusyId(customer.id);
-    setError("");
-    setCopied(false);
-    try {
-      const response = await fetch(`/api/admin/customers/${customer.id}/reset-link`, { method: "POST" });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? "Unable to generate the reset link.");
-      setResetLink({
-        username: customer.username,
-        mobileNumber: result.mobileNumber,
-        url: result.resetUrl,
-      });
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unable to generate the reset link.");
-    } finally {
-      setBusyId("");
-    }
-  }
-
-  async function copyResetLink() {
-    if (!resetLink) return;
-    try {
-      await navigator.clipboard.writeText(resetLink.url);
-      setCopied(true);
-    } catch {
-      setError("Could not copy the reset link. Select and copy it manually.");
-    }
-  }
-
-  const whatsappUrl = resetLink
-    ? `https://wa.me/${resetLink.mobileNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
-        `TORQ Bearings password reset link (expires in 30 minutes): ${resetLink.url}`,
-      )}`
-    : "";
 
   return (
     <>
-      <div className="toolbar">
-        <input className="search-input toolbar-search" aria-label="Search customers" placeholder="Search username or mobile" value={search} onChange={(event) => setSearch(event.target.value)} />
-        <select aria-label="Filter by account status" value={status} onChange={(event) => setStatus(event.target.value)}>
-          <option value="all">All statuses</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="blocked">Blocked</option>
-        </select>
+      <div className="admin-tabs" role="tablist" aria-label="Customer verification status">
+        {statuses.map((item) => (
+          <button
+            key={item}
+            id={`${item}-tab`}
+            className={status === item ? "admin-tab active" : "admin-tab"}
+            type="button"
+            role="tab"
+            aria-selected={status === item}
+            onClick={() => chooseStatus(item)}
+          >
+            {item[0].toUpperCase() + item.slice(1)}
+            <span className="notification-badge">{counts[item]}</span>
+          </button>
+        ))}
       </div>
-      {error && <div className="message message-error" role="alert" style={{ marginBottom: 16 }}>{error}</div>}
-      {resetLink && (
-        <section className="reset-panel" aria-label="Generated password reset link">
-          <div className="reset-panel-heading">
-            <div>
-              <strong>Reset link ready for {resetLink.username}</strong>
-              <span>{resetLink.mobileNumber} · expires in 30 minutes · single-use</span>
-            </div>
-            <button className="reset-close" type="button" aria-label="Close reset link" onClick={() => setResetLink(null)}>×</button>
-          </div>
-          <input className="search-input reset-url" aria-label="Password reset link" readOnly value={resetLink.url} onFocus={(event) => event.currentTarget.select()} />
-          <div className="reset-actions">
-            <button className="button button-secondary" type="button" onClick={() => void copyResetLink()}>{copied ? "Copied" : "Copy link"}</button>
-            <a className="button" href={whatsappUrl} target="_blank" rel="noopener noreferrer">Open WhatsApp</a>
-          </div>
-          <p>Use a deployed HTTPS APP_URL before sharing. Review the pre-filled message, then press Send in WhatsApp. Generating a new link invalidates the previous one.</p>
-        </section>
-      )}
+      <div className="toolbar">
+        <input
+          className="search-input toolbar-search"
+          aria-label="Search customers"
+          placeholder="Search shop, contact, mobile or city"
+          value={search}
+          onChange={(event) => {
+            setSearch(event.target.value);
+            setPage(1);
+          }}
+        />
+      </div>
+      {error && <div className="message message-error" role="alert">{error}</div>}
       <div className="table-wrap">
         <table>
-          <thead><tr><th>Username</th><th>Mobile Number</th><th>Registration Date</th><th>Account Status</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Shop name</th>
+              <th>Contact person</th>
+              <th>City</th>
+              <th>Mobile</th>
+              <th>Status</th>
+              <th>Submitted</th>
+            </tr>
+          </thead>
           <tbody>
             {loading ? (
-              <tr><td className="table-empty" colSpan={5}>Loading customers…</td></tr>
+              <tr><td className="table-empty" colSpan={6}>Loading customers…</td></tr>
             ) : customers.length === 0 ? (
-              <tr><td className="table-empty" colSpan={5}>No customers match your search.</td></tr>
+              <tr><td className="table-empty" colSpan={6}>No customers in this status.</td></tr>
             ) : customers.map((customer) => (
               <tr key={customer.id}>
-                <td className="username">{customer.username}</td>
-                <td>{customer.mobileNumber}</td>
-                <td>{new Date(customer.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}</td>
+                <td><Link className="admin-customer-link" href={`/admin/customers/${customer.id}`}>{customer.shopName || "Details not submitted"}</Link></td>
+                <td>{customer.contactPersonName || "—"}</td>
+                <td>{customer.city || "—"}</td>
+                <td><a href={`tel:${customer.mobileNumber}`}>{customer.mobileNumber}</a></td>
                 <td><span className={`status status-${customer.status}`}>{customer.status}</span></td>
-                <td>
-                  <div className="row-actions">
-                    {customer.status !== "approved" && <button className="button button-small" disabled={busyId === customer.id} onClick={() => void updateStatus(customer, "approved")}>Approve</button>}
-                    {customer.status !== "blocked" && <button className="button button-small button-danger" disabled={busyId === customer.id} onClick={() => void updateStatus(customer, "blocked")}>Block</button>}
-                    <button className="button button-small button-secondary" disabled={busyId === customer.id} onClick={() => void sendReset(customer)}>Reset link</button>
-                  </div>
-                </td>
+                <td>{customer.submittedAt ? new Date(customer.submittedAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "Not submitted"}</td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="admin-pagination" aria-label="Customer pages">
+        <span>{counts[status]} customers · page {page} of {totalPages}</span>
+        <div>
+          <button className="button button-secondary button-small" type="button" disabled={page <= 1 || loading} onClick={() => setPage((value) => value - 1)}>Previous</button>
+          <button className="button button-secondary button-small" type="button" disabled={page >= totalPages || loading} onClick={() => setPage((value) => value + 1)}>Next</button>
+        </div>
       </div>
     </>
   );

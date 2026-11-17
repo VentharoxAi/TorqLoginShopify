@@ -87,7 +87,7 @@ function PasswordResetRequests({
   const loadRequests = useCallback(async () => {
     setError("");
     try {
-      const response = await fetch("/api/admin/password-reset-requests", { cache: "no-store" });
+      const response = await fetch("/admin/api/password-reset-requests", { cache: "no-store" });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? "Unable to load reset requests.");
       setRequests(result.requests);
@@ -111,7 +111,7 @@ function PasswordResetRequests({
     setCopied(false);
     try {
       const response = await fetch(
-        `/api/admin/password-reset-requests/${resetRequest.id}/reset-link`,
+        `/admin/api/password-reset-requests/${resetRequest.id}/reset-link`,
         { method: "POST" },
       );
       const result = await response.json();
@@ -134,7 +134,7 @@ function PasswordResetRequests({
     setBusyId(requestId);
     setError("");
     try {
-      const response = await fetch(`/api/admin/password-reset-requests/${requestId}`, {
+      const response = await fetch(`/admin/api/password-reset-requests/${requestId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "sent" }),

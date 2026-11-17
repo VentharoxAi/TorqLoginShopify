@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       username,
       usernameNormalized: username.toLowerCase(),
       passwordHash,
-      status: "pending",
+      shop_details: { status: "pending", syncVersion: 0 },
       createdAt: new Date(),
       sessionVersion: 0,
     });

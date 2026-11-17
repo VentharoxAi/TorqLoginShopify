@@ -1,23 +1,16 @@
-import Image from "next/image";
 import { redirect } from "next/navigation";
 import { AdminWorkspace } from "@/app/components/admin-workspace";
-import { LogoutButton } from "@/app/components/logout-button";
-import { getSession } from "@/lib/auth";
+import { AdminHeader } from "@/app/components/admin-header";
+import { getStaffSession } from "@/lib/staff-auth";
 
 export default async function AdminPage() {
-  const session = await getSession();
-  if (session?.role !== "admin") redirect("/admin/login");
+  const staff = await getStaffSession();
+  if (!staff) redirect("/admin/login");
   return (
     <main className="app-page">
-      <header className="topbar">
-        <div className="brand">
-          <Image src="/torq-logo.jpg" width={52} height={52} alt="TORQ Bearings logo" unoptimized />
-          <span className="brand-name">TORQ BEARINGS<span className="brand-sub">INDUSTRIES</span></span>
-        </div>
-        <div className="topbar-actions"><span className="header-note">Admin dashboard</span><LogoutButton /></div>
-      </header>
+      <AdminHeader staff={staff} />
       <section className="content-wrap">
-        <div className="page-heading"><h1>Account management</h1><p>Manage customer accounts and review password reset requests.</p></div>
+        <div className="page-heading"><h1>Customer verification</h1><p>Review shop details and manage local account status.</p></div>
         <div className="dashboard-card"><AdminWorkspace /></div>
       </section>
     </main>
