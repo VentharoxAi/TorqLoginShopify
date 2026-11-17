@@ -248,7 +248,7 @@ export function AuthForm({ mode }: Props) {
             />
             <span>
               I agree to the{" "}
-              <a href="https://torqbearingsstore.myshopify.com/policies/terms-of-service" target="_blank" rel="noreferrer">
+              <a href="/shopify-policy/terms-of-service">
                 Terms and Conditions
               </a>
             </span>

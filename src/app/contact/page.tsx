@@ -38,10 +38,10 @@ export default function ContactPage() {
               <h2>Helpful links</h2>
               <div>
                 <Link href="/contact">Contact us</Link>
-                <a href="https://torqbearingsstore.myshopify.com/policies/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-                <a href="https://torqbearingsstore.myshopify.com/policies/shipping-policy" target="_blank" rel="noopener noreferrer">Shipping Policy</a>
-                <a href="https://torqbearingsstore.myshopify.com/policies/refund-policy" target="_blank" rel="noopener noreferrer">Refund Policy</a>
-                <a href="https://torqbearingsstore.myshopify.com/policies/terms-of-service" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a>
+                <Link href="/shopify-policy/privacy-policy">Privacy Policy</Link>
+                <Link href="/shopify-policy/shipping-policy">Shipping Policy</Link>
+                <Link href="/shopify-policy/refund-policy">Refund Policy</Link>
+                <Link href="/shopify-policy/terms-of-service">Terms &amp; Conditions</Link>
               </div>
             </nav>
           </div>

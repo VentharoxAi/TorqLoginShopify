@@ -11,7 +11,7 @@ export function AuthBackLink() {
   }
 
   return (
-    <a className="auth-back-link" href="https://torqbearingsstore.myshopify.com/" onClick={goBack}>
+    <a className="auth-back-link" href="/" onClick={goBack}>
       <span aria-hidden="true">←</span> Back
     </a>
   );

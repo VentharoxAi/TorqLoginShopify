@@ -3,8 +3,6 @@ import { getCustomerHeaderCustomer } from "@/lib/customer-header";
 import { CustomerHeader } from "@/app/components/customer-header";
 import type { CustomerHeaderCustomer } from "@/lib/customer-header";
 
-const storeUrl = "https://torqbearingsstore.myshopify.com";
-
 export { getCustomerHeaderCustomer } from "@/lib/customer-header";
 
 export async function StoreHeader({
@@ -30,16 +28,16 @@ export function StoreFooter() {
         </section>
         <section className="footer-contact">
           <h2>Get in touch</h2>
-          <Link href={`${storeUrl}/pages/contact`} target="_blank" rel="noopener noreferrer">Contact TORQ Bearings</Link>
+          <Link href="/contact">Contact TORQ Bearings</Link>
         </section>
         <section className="footer-links">
           <h2>Helpful links</h2>
           <div>
-            <Link href={`${storeUrl}/pages/contact`} target="_blank" rel="noopener noreferrer">Contact us</Link>
-            <Link href={`${storeUrl}/policies/privacy-policy`} target="_blank" rel="noopener noreferrer">Privacy Policy</Link>
-            <Link href={`${storeUrl}/policies/shipping-policy`} target="_blank" rel="noopener noreferrer">Shipping Policy</Link>
-            <Link href={`${storeUrl}/policies/refund-policy`} target="_blank" rel="noopener noreferrer">Refund Policy</Link>
-            <Link href={`${storeUrl}/policies/terms-of-service`} target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</Link>
+            <Link href="/contact">Contact us</Link>
+            <Link href="/shopify-policy/privacy-policy">Privacy Policy</Link>
+            <Link href="/shopify-policy/shipping-policy">Shipping Policy</Link>
+            <Link href="/shopify-policy/refund-policy">Refund Policy</Link>
+            <Link href="/shopify-policy/terms-of-service">Terms &amp; Conditions</Link>
           </div>
         </section>
       </div>

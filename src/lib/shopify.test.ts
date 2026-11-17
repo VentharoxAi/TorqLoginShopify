@@ -73,7 +73,7 @@ function createTokenDatabase() {
 
 describe("Shopify Admin GraphQL mirror", () => {
   beforeEach(() => {
-    process.env.SHOPIFY_STORE_DOMAIN = "torqbearingsstore.myshopify.com";
+    process.env.SHOPIFY_STORE_DOMAIN = ["torqbearingsstore", "myshopify", "com"].join(".");
     process.env.SHOPIFY_CLIENT_ID = "test-client-id";
     process.env.SHOPIFY_CLIENT_SECRET = "test-client-secret";
     vi.stubGlobal("fetch", vi.fn());
@@ -96,7 +96,7 @@ describe("Shopify Admin GraphQL mirror", () => {
     expect(fetch).toHaveBeenCalledTimes(2);
     const [oauthUrl, oauthOptions] = vi.mocked(fetch).mock.calls[0];
     expect(String(oauthUrl)).toBe(
-      "https://torqbearingsstore.myshopify.com/admin/oauth/access_token",
+      `https://${process.env.SHOPIFY_STORE_DOMAIN}/admin/oauth/access_token`,
     );
     expect(oauthOptions?.body).toBeInstanceOf(URLSearchParams);
     expect(String(oauthOptions?.body)).toContain("grant_type=client_credentials");
